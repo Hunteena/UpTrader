@@ -1,30 +1,10 @@
 from django.db import models
 
 
-class Menu(models.Model):
+class Item(models.Model):
     name = models.CharField(
         max_length=128,
-        unique=True,
-        verbose_name='Название меню',
-    )
-
-    class Meta:
-        verbose_name = 'Меню'
-        verbose_name_plural = 'Меню'
-
-    def __str__(self):
-        return self.name
-
-
-class Item(models.Model):
-    name = models.CharField(max_length=128,
-                            verbose_name='Название пункта меню')
-    url = models.CharField(max_length=256)
-    menu = models.ForeignKey(
-        Menu,
-        on_delete=models.CASCADE,
-        related_name='items',
-        verbose_name='Меню',
+        verbose_name='Название',
     )
     parent = models.ForeignKey(
         'self',
@@ -32,9 +12,22 @@ class Item(models.Model):
         blank=True,
         null=True,
         related_name='children',
-        verbose_name='Родительский пункт меню',
+        verbose_name='Родитель',
+        help_text='Если родитель не задан, то объект является верхнеуровневым '
+                  'и определяет название меню',
     )
-    path = models.CharField(max_length=256)
+    url = models.CharField(
+        max_length=256,
+        blank=True,
+        null=True,
+        verbose_name='Путь (после домена)',
+        help_text='Введите путь в формате /somepath/. '
+                  'Для меню (верхнеуровнего объекта без родителя) не нужен',
+    )
+    path = models.CharField(
+        max_length=256,
+        verbose_name='Последовательность предков',
+    )
 
     class Meta:
         ordering = ['path']
@@ -49,6 +42,6 @@ class Item(models.Model):
         if self.parent:
             self.path = f"{self.parent.path} {self.id}"
         else:
-            self.path = f"{self.menu_id} {self.id}"
+            self.path = f"{self.id} "
         super().save(*args, **kwargs, update_fields=['path'])
         # TODO change children's path on updating parent

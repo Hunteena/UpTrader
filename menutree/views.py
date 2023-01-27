@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from django.template import loader
 
-from .models import Item, Menu
+from .models import Item
 
 
 def index(request):

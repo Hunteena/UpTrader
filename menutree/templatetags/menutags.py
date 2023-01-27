@@ -1,6 +1,6 @@
 from django import template
 
-from menutree.models import Item, Menu
+from menutree.models import Item
 
 register = template.Library()
 
@@ -22,21 +22,17 @@ def draw_children(context, item_id, children):
 
 @register.inclusion_tag('menutree/sublist.html', takes_context=True)
 def draw_menu(context, menu_name):
-    menu = Menu.objects.filter(name=menu_name).first()
-    if not menu:
-        return {'no_menu_error': 'No such menu'}
-
     active_path = context['request'].path
     ancestors_ids = []
+    menu_id = None
 
-    item_fields = ['name', 'path', 'url']
-    items = Item.objects.filter(
-        path__startswith=f"{menu.id} "
-    ).select_related(
-        'children'
-    ).values(
+    item_fields = ['name', 'parent', 'path', 'url']
+    items = Item.objects.select_related('children').values(
         'id', *item_fields, 'children'
     )
+
+    # Создадим словарь, где ключом является id, а значением - словарь полей,
+    # в том числе соберём все дочерние пункты меню в один список
     items_dict = dict()
     for item in items:
         item_id = item['id']
@@ -47,12 +43,20 @@ def draw_menu(context, menu_name):
             items_dict[item_id] = {'children': [child]}
             for field in item_fields:
                 items_dict[item_id][field] = item[field]
+        # По URL страницы определим активный пункт меню и его предков
         if item['url'] == active_path:
-            ancestors_ids = list(map(int, item['path'].split(' ')[1:]))
+            ancestors_ids = list(map(int, item['path'].split()[1:]))
+        # Определим id нужного меню (верхнеуровнего объекта)
+        if item['parent'] is None and item['name'] == menu_name:
+            menu_id = item['id']
+
+    if not menu_id:
+        return {'no_menu_error': 'No such menu'}
 
     iterator = {item_id: items_dict[item_id]
                 for item_id in items_dict
-                if items_dict[item_id]['parent'] is None}
+                if items_dict[item_id]['parent']
+                and items_dict[item_id]['parent'] == menu_id}
 
     return {
         "iterator": iterator,
