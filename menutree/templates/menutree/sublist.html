@@ -1,0 +1,14 @@
+{% load menutags %}
+{{ no_menu_error }}
+<ul>
+
+  {% for item_id, fields in iterator.items %}
+
+    <li>
+      <a href="{{ fields.url }}">{{ fields.name }}</a>
+      {% draw_children item_id fields.children %}
+    </li>
+
+  {% endfor %}
+
+</ul>
