@@ -15,9 +15,17 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from menutree.views import index
+
+from menutree.views import menu
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('menu/', index, name='main')
 ]
+
+lorem_ipsum = 'lorem ipsum dolor sit amet consectetur adipiscing elit'
+example_urlpatterns = [
+    path(f"{word}/", menu, name=f"{word}-url")
+    for word in lorem_ipsum.split()
+] + [path('menu/', menu, name='main')]
+
+urlpatterns += example_urlpatterns

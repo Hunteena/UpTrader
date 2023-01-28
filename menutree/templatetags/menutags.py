@@ -1,4 +1,5 @@
 from django import template
+from django.urls import reverse, NoReverseMatch
 
 from menutree.models import Item
 
@@ -26,13 +27,14 @@ def draw_menu(context, menu_name):
     ancestors_ids = []
     menu_id = None
 
-    item_fields = ['name', 'parent', 'path', 'url']
+    item_fields = ['name', 'parent', 'url', 'path']
     items = Item.objects.select_related('children').values(
         'id', *item_fields, 'children'
     )
 
     # Создадим словарь, где ключом является id, а значением - словарь полей,
-    # в том числе соберём все дочерние пункты меню в один список
+    # в том числе соберём все дочерние пункты меню в один список,
+    # а также определим список предков и обычный URL для named URL
     items_dict = dict()
     for item in items:
         item_id = item['id']
@@ -43,15 +45,27 @@ def draw_menu(context, menu_name):
             items_dict[item_id] = {'children': [child]}
             for field in item_fields:
                 items_dict[item_id][field] = item[field]
-        # По URL страницы определим активный пункт меню и его предков
-        if item['url'] == active_path:
-            ancestors_ids = list(map(int, item['path'].split()[1:]))
+        # По URL страницы определим активный пункт меню, его url и предков
+        if item['url']:
+            try:
+                # Проверяем, является ли значение поля named URL
+                items_url = reverse(item['url'])
+            except NoReverseMatch:
+                # Считаем, что поле содержит обычный URL
+                items_url = item['url']
+            items_dict[item_id]['url'] = items_url
+            if items_url == active_path:
+                ancestors_ids = list(map(int, item['path'].split()[1:]))
+        else:
+            items_url = ''
+        items_dict[item_id]['url'] = items_url
+
         # Определим id нужного меню (верхнеуровнего объекта)
         if item['parent'] is None and item['name'] == menu_name:
             menu_id = item['id']
 
     if not menu_id:
-        return {'no_menu_error': 'No such menu'}
+        return {'error_message': f"No such menu '{menu_name}'"}
 
     iterator = {item_id: items_dict[item_id]
                 for item_id in items_dict

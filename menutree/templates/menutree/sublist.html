@@ -1,14 +1,20 @@
 {% load menutags %}
-{{ no_menu_error }}
+{{ error_message }}
+
 <ul>
 
-  {% for item_id, fields in iterator.items %}
+    {% for item_id, fields in iterator.items %}
 
     <li>
-      <a href="{{ fields.url }}">{{ fields.name }}</a>
-      {% draw_children item_id fields.children %}
+        {% if item_id == ancestors_ids|last %}
+            {{ fields.name }}
+        {% else %}
+            <a href="{{ fields.url }}">{{ fields.name }}</a>
+        {% endif %}
+
+        {% draw_children item_id fields.children %}
     </li>
 
-  {% endfor %}
+    {% endfor %}
 
 </ul>

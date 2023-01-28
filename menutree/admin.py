@@ -14,5 +14,6 @@ class ItemInline(admin.TabularInline):
 @admin.register(Item)
 class ItemAdmin(admin.ModelAdmin):
     inlines = [ItemInline]
-    list_display = ['id', 'name', 'parent', 'path', 'url']
     readonly_fields = ['id', 'path']
+    list_display = ['id', 'name', 'parent', 'url', 'path']
+    ordering = ['path']
