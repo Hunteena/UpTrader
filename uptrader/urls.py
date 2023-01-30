@@ -26,6 +26,6 @@ lorem_ipsum = 'lorem ipsum dolor sit amet consectetur adipiscing elit'
 example_urlpatterns = [
     path(f"{word}/", menu, name=f"{word}-url")
     for word in lorem_ipsum.split()
-] + [path('menu/', menu, name='main')]
+] + [path('', menu, name='main')]
 
 urlpatterns += example_urlpatterns
