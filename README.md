@@ -8,7 +8,7 @@ Telegram: [@Hunteena](https://t.me/Hunteena)
 портфолио: [https://github.com/Hunteena](https://github.com/Hunteena)
 
 ### Задача: 
-отрисовка древовидного меню с помощью templatetag, сделав только один запрос к базе данных.
+реализовать древовидное меню с помощью templatetag, сделав только один запрос к базе данных.
 ### Локальный запуск проекта
 
 
