@@ -1,5 +1,14 @@
 ## Тестовое задание на вакансию Junior Python Backend Developer (АпТрейдер)
 
+#### Выполнила Нина Сперанская
+#### Контакты:
+тел. +7 (705) 786-75-06 (Казахстан)  
+email: nina.speranskaya35@gmail.com  
+Telegram: [@Hunteena](https://t.me/Hunteena)  
+портфолио: [https://github.com/Hunteena](https://github.com/Hunteena)
+
+### Задача: 
+отрисовка древовидного меню с помощью templatetag, сделав только один запрос к базе данных.
 ### Локальный запуск проекта
 
 
